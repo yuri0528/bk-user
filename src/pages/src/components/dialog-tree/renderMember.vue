@@ -2,33 +2,41 @@
   <render-horizontal-block
     :label="$t('启用范围')">
     <section class="action-wrapper" @click.stop="handleAddMember" data-test-id="grading_btn_showAddMember">
-      <Icon bk type="plus-circle-shape" />
+      <i class="bk-icon icon-plus-circle-shape plus-circle-shape" />
       <span>{{ $t('添加范围') }}</span>
     </section>
-    <div style="margin-top: 9px;" v-if="isAll">
-      <div class="all-item">
-        <span class="member-name">{{ $t('全员') }}</span>
-        <span class="display-name">(All)</span>
-        <Icon bk type="close-circle-shape" class="remove-icon" @click="handleDelete" />
+    <div :class="['action-content', { 'is-active': isActive }]">
+      <div style="margin-top: 9px;" v-if="isAll">
+        <div class="all-item">
+          <span class="member-name">{{ $t('全员') }}</span>
+          <span class="display-name">(All)</span>
+          <i class="user-icon icon-close-fill remove-icon" @click="handleDelete" />
+        </div>
       </div>
+      <template v-else>
+        <render-member-item :data="users" @on-delete="handleDeleteUser" v-if="isHasUser" />
+        <render-member-item
+          :data="departments" type="department" v-if="isHasDepartment"
+          @on-delete="handleDeleteDepartment" />
+      </template>
+      <bk-button
+        class="submit-button"
+        theme="primary" type="button" @click="handleSubmit"
+        data-test-id="grading_btn_createSubmit"
+        :disabled="isDisabled"
+        :loading="submitLoading">
+        {{ $t('提交') }}
+      </bk-button>
     </div>
-    <template v-else>
-      <render-member-item :data="users" @on-delete="handleDeleteUser" v-if="isHasUser" />
-      <render-member-item
-        :data="departments" type="department" v-if="isHasDepartment"
-        @on-delete="handleDeleteDepartment" />
-    </template>
   </render-horizontal-block>
 </template>
 <script>
 import RenderHorizontalBlock from './renderHorizontalBlock.vue';
 import RenderMemberItem from './RenderMemberDisplay.vue';
-import Icon from './iconIndex';
 export default {
   components: {
     RenderHorizontalBlock,
     RenderMemberItem,
-    Icon,
   },
   props: {
     users: {
@@ -45,7 +53,9 @@ export default {
     },
   },
   data() {
-    return {};
+    return {
+      isDisabled: true,
+    };
   },
   computed: {
     isHasUser() {
@@ -53,6 +63,24 @@ export default {
     },
     isHasDepartment() {
       return this.departments.length > 0;
+    },
+    changeDate() {
+      const { isAll, departments, users } = this;
+      return {
+        isAll,
+        departments,
+        users,
+      };
+    },
+    isActive() {
+      return this.isHasUser || this.isHasDepartment || this.isAll;
+    },
+  },
+  watch: {
+    changeDate(newVal, oldVal) {
+      if (newVal !== oldVal) {
+        this.isDisabled = false;
+      }
     },
   },
   methods: {
@@ -67,6 +95,9 @@ export default {
     },
     handleDelete() {
       this.$emit('on-delete-all');
+    },
+    handleSubmit() {
+      this.isDisabled = true;
     },
   },
 };
@@ -86,6 +117,20 @@ export default {
     top: -1px;
     left: 2px;
   }
+}
+.action-content {
+  max-width: 800px;
+  margin: 10px;
+  position: relative;
+  padding: 10px;
+  .submit-button {
+    position: absolute;
+    bottom: -43px;
+    right: 0;
+  }
+}
+.is-active {
+  border: 1px solid #dcdee5;
 }
 .all-item {
   position: relative;

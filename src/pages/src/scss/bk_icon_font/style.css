@@ -35,14 +35,54 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+.icon-info-i:before {
+	content: "\e105";
+}
+.icon-dobble-arrow-i:before {
+	content: "\e108";
+}
 .icon-user-logo-i:before {
-  content: '\e5e5';
+	content: "\e102";
 }
-
 .icon-root-node-i:before {
-  content: '\eb8f';
+	content: "\e103";
 }
-
 .icon-duihao-i:before {
-  content: '\ed44';
+	content: "\e104";
+}
+.icon-unfilled-i:before {
+	content: "\e106";
+}
+.icon-todo-i:before {
+	content: "\e107";
+}
+.icon-loading-i:before {
+	content: "\e109";
+}
+.icon-add-hollow:before {
+	content: "\e10a";
+}
+.icon-close-fill:before {
+	content: "\e10b";
+}
+.icon-organization-fill:before {
+	content: "\e10d";
+}
+.icon-personal-user:before {
+	content: "\e10c";
+}
+.icon-outline-list:before {
+	content: "\e10e";
+}
+.icon-duihao-2:before {
+	content: "\e10f";
+}
+.icon-file-close:before {
+	content: "\e110";
+}
+.icon-info-fill:before {
+	content: "\e111";
+}
+.icon-user-directory:before {
+	content: "\e113";
 }

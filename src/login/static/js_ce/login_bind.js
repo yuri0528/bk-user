@@ -54,8 +54,10 @@ $(document).ready(function(){
         $('.is-chrome').hide();
     }
 
+    getCode();
+
     $('#code-btn').click(function() {
-        if ($('#code-btn').html() !== '验证码') {
+        if ($('#code-btn').html() === '获取验证码') {
             getCode();
         }
     })
@@ -64,23 +66,16 @@ $(document).ready(function(){
 function getCode() {
     // 获取验证码
     var btn = $('#code-btn');
-    var code = $('#validation');
     var count = 60;
     var timer = setInterval(() => {
         if (count > 1) {
             count --;
             btn.attr('class', 'code-btn-hide');
-            btn.html('验证码');
-            code.attr('placeholder', `获取验证码（${count}s）`);
+            btn.html(`获取验证码（${count}s）`);
         } else {
             clearInterval(timer);
             btn.html('获取验证码');
             btn.attr('class', 'code-btn');
-            code.attr('placeholder', '');
         }
     }, 1000);
-}
-
-window.onload = function() {
-    this.getCode();
 }

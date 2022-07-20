@@ -354,16 +354,22 @@ input[type="number"]::-webkit-outer-spin-button {
   display: flex;
   align-items: center;
 }
-.page-content .login-from .form-login .group-control .validation-left .code-btn {
+.page-content .login-from .form-login .group-control .code-btn {
   font-size: 14px;
   color: #3a84ff;
   cursor: pointer;
-  margin-left: 10px;
+  position: absolute;
+  display: inherit;
+  top: 10px;
+  right: 10px;
 }
-.page-content .login-from .form-login .group-control .validation-left .code-btn-hide {
+.page-content .login-from .form-login .group-control .code-btn-hide {
   font-size: 14px;
   color: #c4c6cc;
-  margin-left: 10px;
+  position: absolute;
+  display: inherit;
+  top: 10px;
+  right: 10px;
 }
 .page-content .login-from .form-login .group-control .validation-right {
   width: 100%;
@@ -372,8 +378,7 @@ input[type="number"]::-webkit-outer-spin-button {
   border: 1px solid #c4c6cc;
   color: #63656e;
   border-radius: 2px;
-  padding: 0 10px 0 200px;
-  text-align: center;
+  padding: 0 130px 0 40px;
 }
 .page-content .login-from .form-login .error {
   padding-top: 5px;

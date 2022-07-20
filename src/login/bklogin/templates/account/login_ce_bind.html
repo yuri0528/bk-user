@@ -45,10 +45,10 @@
                             <div class="validation group-control">
                                 <div class="validation-left">
                                     <i class="bk-icon icon-yanzhengma"></i>
-                                    <span class="code-btn-hide" id="code-btn">{% trans '获取验证码' %}</span>
                                 </div>
-                                    <input class="validation-right" id="validation" type="number" name="validation" value=""
-                                        autocomplete="off" oninput="if(value.length>8)value=value.slice(0,8)">
+                                <input class="validation-right" id="validation" type="number" name="validation" value="" placeholder="验证码"
+                                    autocomplete="off" oninput="if(value.length>8)value=value.slice(0,8)">
+                                <span class="code-btn-hide" id="code-btn">{% trans '获取验证码' %}</span>
                             </div>
                             <p class="error">
                                 {% trans '验证码错误' %}

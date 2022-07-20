@@ -44,5 +44,13 @@ export default {
         updating_ids: params.idList,
       });
     },
+    // 获取全局配置元信息
+    getGlobalSettings(context, params, config = {}) {
+      return http.get('api/v2/global_settings/metas/');
+    },
+    getNamespaces(context, params, config = {}) {
+      const { namespace } = params;
+      return http.get(`api/v2/global_settings/namespaces/namespace=${namespace}/`);
+    },
   },
 };

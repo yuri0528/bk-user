@@ -131,6 +131,13 @@
               <span class="text">{{passwordValidDays}}</span>
             </p>
           </div>
+          <div class="specific-text">
+            <span class="name">{{$t('双因子认证')}}</span>
+            <span class="gap">：</span>
+            <p class="desc">
+              <span class="text">{{doubleFactor ? $t('开启') : $t('关闭')}}</span>
+            </p>
+          </div>
         </li>
       </ul>
     </div>
@@ -177,6 +184,10 @@ export default {
     timerMap: {
       type: Array,
       required: true,
+    },
+    doubleFactor: {
+      type: Boolean,
+      default: '',
     },
   },
   data() {

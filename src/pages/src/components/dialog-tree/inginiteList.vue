@@ -10,13 +10,13 @@
                    { 'is-disabled': item.disabled || isDisabled }]"
           :title="item.disabled ? $t('该成员已添加') : item.full_name"
           @click.stop="nodeClick(item)">
-          <Icon type="file-close" class="folder-icon" />
+          <i class="user-icon icon-file-close folder-icon" />
           <span
             class="organization-name"
             :class="item.disabled ? 'is-disabled' : ''">
             {{ item.name }}
           </span>
-          <span class="user-count" v-if="item.showCount">{{ '(' + item.count + ')' }}</span>
+          <span class="user-count" v-if="item.showCount && item.count">{{ '(' + item.count + ')' }}</span>
           <div class="organization-checkbox" v-if="item.showRadio">
             <span
               class="node-checkbox"
@@ -38,14 +38,14 @@
                    { 'is-disabled': item.disabled || isDisabled }]"
           :title="item.disabled ? $t('该成员已添加') : ''"
           @click.stop="nodeClick(item)">
-          <Icon type="personal-user" class="user-icon" />
+          <i class="user-icon icon-personal-user user-icon" />
           <span
             class="user-name"
             :class="item.disabled ? 'is-disabled' : ''"
-            :title="item.name !== '' ? `${item.username}(${item.name})` : item.username">
+            :title="item.display_name !== '' ? `${item.username}(${item.display_name})` : item.username">
             {{ item.username }}
-            <template v-if="item.name !== ''">
-              ({{ item.name }})
+            <template v-if="item.display_name !== ''">
+              ({{ item.display_name }})
             </template>
           </span>
           <div class="user-checkbox" v-if="item.showRadio">
@@ -67,11 +67,7 @@
 </template>
 <script>
 import _ from 'lodash';
-import Icon from './iconIndex';
 export default {
-  components: {
-    Icon,
-  },
   props: {
     // 所有数据
     allData: {

@@ -30,6 +30,7 @@
       :fields-list="fieldsList"
       :status-map="statusMap"
       :timer-map="timerMap"
+      :double-factor="doubleFactor"
       @editProfile="editProfile"
       @deleteProfile="$emit('deleteProfile')"
       @restoreProfile="$emit('restoreProfile')"
@@ -111,6 +112,12 @@
                     :name="option.text">
                   </bk-option>
                 </bk-select>
+              </div>
+            </li>
+            <li class="infor-list">
+              <p class="desc">{{$t('双因子认证')}}</p>
+              <div class="input-text">
+                <bk-input disabled :value="doubleFactor ? $t('开启') : $t('关闭')"></bk-input>
               </div>
             </li>
           </ul>
@@ -220,6 +227,7 @@ export default {
       copyList: [],
       timer: null,
       showselectData: false,
+      doubleFactor: false,
     };
   },
   computed: {

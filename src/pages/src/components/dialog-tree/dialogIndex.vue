@@ -22,6 +22,48 @@
               <span class="active-line" v-if="tabActive === item.name"></span>
             </section>
           </div>
+          <!-- <div
+            :class="['search-input', { 'active': isSerachFocus },
+                     { 'disabled': (isRatingManager || isAll) && !isAllFlag }]" v-if="isOrganization">
+            <bk-dropdown-menu
+              align="left"
+              ref="dropdown"
+              trigger="click">
+              <template slot="dropdown-trigger">
+                <Icon
+                  bk
+                  class="search-icon"
+                  :type="searchConditionValue === 'fuzzy' ? 'search' : 'search'" />
+              </template>
+              <ul class="bk-dropdown-list" slot="dropdown-content">
+                <li
+                  v-for="item in searchConditionList"
+                  :key="item.id"
+                  @click.stop="handleConditionSelcted(item)">
+                  <a href="javascript:;" :class="{ 'active': item.id === searchConditionValue }">
+                    <Icon
+                      bk
+                      class="search-config-icon" style="font-size: 16px;"
+                      :type="item.id === 'fuzzy' ? 'search' : 'search'" />
+                    {{ item.name }}
+                  </a>
+                </li>
+              </ul>
+            </bk-dropdown-menu>
+            <bk-input
+              v-model="keyword"
+              :placeholder="$t('用户或组织')"
+              maxlength="64"
+              clearable
+              :disabled="(isRatingManager || isAll) && !isAllFlag"
+              ext-cls="iam-add-member-search-input-cls"
+              @focus="handleSearchInput"
+              @blur="handleSearchBlur"
+              @keyup.enter.native="handleSearch"
+              @keyup.up.native="handleKeyup"
+              @keyup.down.native="handleKeydown">
+            </bk-input>
+          </div> -->
           <div
             class="member-tree-wrapper"
             v-bkloading="{ isLoading: treeLoading, opacity: 1 }"
@@ -71,13 +113,12 @@
                 </template>
                 <template v-if="isSeachResultTooMuch">
                   <div class="too-much-wrapper">
-                    <Icon type="warning" class="much-tips-icon" />
                     <p class="text">{{ $t('搜索结果') }}</p>
                   </div>
                 </template>
                 <template v-if="isSeachResultEmpty">
                   <div class="search-empty-wrapper">
-                    <iam-svg />
+                    <i class="bk-icon icon-empty"></i>
                     <p class="empty-tips">{{ $t('搜索无结果') }}</p>
                   </div>
                 </template>
@@ -127,22 +168,22 @@
           <div class="content">
             <div class="organization-content" v-if="isDepartSelectedEmpty">
               <div class="organization-item" v-for="item in hasSelectedDepartments" :key="item.id">
-                <Icon bk type="folder-shape" class="folder-icon" />
+                <i class="user-icon icon-file-close folder-icon" />
                 <span class="organization-name" :title="item.fullName">{{ item.name }}</span>
-                <span class="user-count" v-if="item.showCount">{{ '(' + item.count + `)` }}</span>
-                <Icon
-                  bk type="close-circle-shape" class="delete-depart-icon"
+                <span class="user-count" v-if="item.showCount && item.count">{{ '(' + item.count + `)` }}</span>
+                <i
+                  class="user-icon icon-close-fill delete-depart-icon"
                   @click="handleDelete(item, 'organization')" />
               </div>
             </div>
             <div class="user-content" v-if="isUserSelectedEmpty">
               <div class="user-item" v-for="item in hasSelectedUsers" :key="item.id">
-                <Icon bk type="user-shape" class="user-icon" />
+                <i class="user-icon icon-personal-user user-icon" />
                 <span class="user-name" :title="item.name !== '' ? `${item.username}(${item.name})` : item.username">
                   {{ item.username }}
                   <template v-if="item.display_name !== ''">({{ item.display_name }})</template>
                 </span>
-                <Icon bk type="close-circle-shape" class="delete-icon" @click="handleDelete(item, 'user')" />
+                <i class="user-icon icon-close-fill delete-icon" @click="handleDelete(item, 'user')" />
               </div>
             </div>
             <div class="selected-empty-wrapper" v-if="isSelectedEmpty">
@@ -172,8 +213,6 @@
 import _ from 'lodash';
 import InfiniteTree from './infiniteTree.vue';
 import dialogInfiniteList from './inginiteList.vue';
-import { guid } from '@/common/util';
-import Icon from './iconIndex';
 
 // 去除()以及之间的字符
 const getUsername = (str) => {
@@ -186,11 +225,9 @@ const getUsername = (str) => {
 };
 
 export default {
-//   name: '',
   components: {
     InfiniteTree,
     dialogInfiniteList,
-    Icon,
   },
   props: {
     show: {
@@ -258,11 +295,21 @@ export default {
       defaultDepartments: [],
       defaultUsers: [],
       isShowTooMuch: false,
+      searchConditionList: [
+        {
+          id: 'fuzzy',
+          name: this.$t('模糊搜索'),
+        },
+        {
+          id: 'exact',
+          name: this.$t('精确搜索'),
+        },
+      ],
       searchConditionValue: 'fuzzy',
       isSerachFocus: false,
       panels: [
         { name: 'organization', label: this.$t('组织架构') },
-        { name: 'manual', label: this.$t('手动输入') },
+        // { name: 'manual', label: this.$t('手动输入') },
       ],
       tabActive: 'organization',
       manualValue: '',
@@ -271,6 +318,7 @@ export default {
       manualValueBackup: [],
       isAll: false,
       isAllFlag: false,
+      treeId: null,
     };
   },
   computed: {
@@ -579,6 +627,7 @@ export default {
         const res = await this.$store.dispatch('organization/getOrganizationTree');
         const categories = [...res.data];
         categories.forEach((item) => {
+          this.treeId = item.id;
           item.visiable = true;
           item.level = 0;
           item.showRadio = false;
@@ -714,19 +763,31 @@ export default {
       const defaultUserIds = [...this.defaultUsers.map(item => item.id)];
       const departIds = [...this.hasSelectedDepartments.map(item => item.id)];
       const userIds = [...this.hasSelectedUsers.map(item => item.username)];
-      const params = {
-        keyword: this.keyword,
-        is_exact: this.searchConditionValue === 'exact',
-      };
+
       try {
-        const res = await this.$store.dispatch('organization/getSeachOrganizations', params);
-        if (res.data.is_too_much) {
-          this.isShowTooMuch = true;
-          return;
-        }
-        this.isShowTooMuch = false;
-        if (res.data.departments.length > 0) {
-          res.data.departments.forEach((depart) => {
+        const res = await this.$store.dispatch('organization/getSearchResult', {
+          searchKey: this.keyword,
+          searchLength: 40,
+        });
+        // console.log('res', res.data);
+        const departmentsList = [];
+        const userNameList = [];
+        res.data.map((item) => {
+          if (item.items.length) {
+            if (item.type === 'department') {
+              item.items.forEach(child => departmentsList.push(child));
+            } else {
+              item.items.forEach(child => userNameList.push(child));
+            }
+          }
+        });
+        // if (res.data.is_too_much) {
+        //   this.isShowTooMuch = true;
+        //   return;
+        // }
+        // this.isShowTooMuch = false;
+        if (departmentsList.length > 0) {
+          departmentsList.forEach((depart) => {
             depart.showRadio = true;
             depart.type = 'depart';
             if (departIds.length && departIds.includes(depart.id)) {
@@ -741,11 +802,10 @@ export default {
             depart.count = depart.recursive_member_count;
             depart.showCount = true;
           });
-          this.searchedDepartment.splice(0, this.searchedDepartment.length, ...res.data.departments);
+          this.searchedDepartment.splice(0, this.searchedDepartment.length, ...departmentsList);
         }
-        if (res.data.users.length > 0) {
-          res.data.users.forEach((user) => {
-            user.id = guid();
+        if (userNameList.length > 0) {
+          userNameList.forEach((user) => {
             user.showRadio = true;
             user.type = 'user';
             if (userIds.length && userIds.includes(user.username)) {
@@ -758,7 +818,7 @@ export default {
               this.$set(user, 'disabled', true);
             }
           });
-          this.searchedUsers.splice(0, this.searchedUsers.length, ...res.data.users);
+          this.searchedUsers.splice(0, this.searchedUsers.length, ...userNameList);
         }
         this.searchedResult.splice(
           0,
@@ -836,7 +896,7 @@ export default {
             child.type = 'depart';
             child.count = child.recursive_member_count;
             child.showCount = true;
-            child.async = payload.has_children;
+            child.async = child.has_children;
             child.isNewMember = false;
             child.parentNodeId = payload.id;
 
@@ -857,6 +917,7 @@ export default {
 
         if (members.length > 0) {
           members.forEach((child) => {
+            if (child.departments.length > 0 && children.length > 0) return;
             child.visiable = payload.expanded;
             child.level = payload.level + 1;
             child.loading = false;
@@ -1044,6 +1105,9 @@ export default {
         min-height: 309px;
         .iam-add-member-search-input-cls {
           padding-right: 10px;
+          .control-icon {
+            margin-right: 10px;
+          }
         }
       }
       .tree {
@@ -1135,12 +1199,12 @@ export default {
           top: 50%;
           text-align: center;
           transform: translate(-50%, -50%);
-          img {
-            width: 120px;
+          .icon-empty {
+            font-size: 60px;
+            color: #dcdee5;
           }
           .empty-tips {
             position: relative;
-            top: -20px;
             font-size: 12px;
             color: #dcdee5;
           }

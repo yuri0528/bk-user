@@ -25,12 +25,6 @@
         @on-delete="handleMemberDelete"
         @on-delete-all="handleDeleteAll" />
       <p class="action-empty-error" v-if="isShowMemberEmptyError">{{ $t('可授权人员范围不可为空') }}</p>
-      <bk-button
-        theme="primary" type="button" @click="handleSubmit"
-        data-test-id="grading_btn_createSubmit"
-        :loading="submitLoading">
-        {{ $t('提交') }}
-      </bk-button>
       <dialog-index
         :show.sync="isShowAddMemberDialog"
         :users="users"
@@ -71,6 +65,7 @@ export default {
   },
   created() {
     this.getUser();
+    // this.getGlobalSettings();
   },
   methods: {
     async fetchPageData() {
@@ -135,7 +130,15 @@ export default {
     },
     async getUser() {
       const res = await this.$store.dispatch('getUserInfo');
+      console.log('getUser', res);
       this.username = res.data.username;
+    },
+    async getGlobalSettings() {
+      const params = {
+        namespace: 'two_factor_authentication',
+      };
+      const res = await this.$store.dispatch('setting/getNamespaces', params);
+      console.log('getGlobalSettings', res);
     },
     handleAddMember() {
       this.isShowAddMemberDialog = true;

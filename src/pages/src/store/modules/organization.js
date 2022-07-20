@@ -126,5 +126,10 @@ export default {
     getDepartmentsList(context, params, config = {}) {
       return http.get(`api/v3/departments/?${params}`);
     },
+
+    // 双因子 获取全局配置元信息
+    getGlobalSettings(context, params, config = {}) {
+      return http.get('api/v2/global_settings/metas/');
+    },
   },
 };

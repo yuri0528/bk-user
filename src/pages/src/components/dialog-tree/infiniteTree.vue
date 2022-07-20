@@ -8,32 +8,26 @@
         :class="['node-item', { 'active': item.selected }, { 'is-disabled': item.disabled || isDisabled }]"
         :title="item.disabled ? $t('该成员已添加') : ''"
         @click.stop="nodeClick(item)">
-        <Icon
-          bk
+        <i
           v-if="item.async"
-          class="arrow-icon"
-          :type="item.expanded ? 'down-shape' : 'right-shape'"
+          :class="['arrow-icon', item.expanded ? 'bk-icon icon-down-shape' : 'bk-icon icon-right-shape']"
           @click.stop="expandNode(item)" />
         <template v-if="item.type === 'depart'">
-          <Icon
-            bk
+          <i
             v-if="item.level || isRatingManager"
-            type="folder-shape"
-            :class="['node-icon file-icon', { 'active': item.selected }]" />
-          <Icon
+            :class="['user-icon icon-file-close node-icon file-icon', { 'active': item.selected }]" />
+          <i
             v-else
-            bk
-            type="work-manage"
-            class="node-icon" />
+            class="user-icon icon-root-node-i node-icon" />
         </template>
-        <Icon v-else bk type="user-shape" class="node-svg" />
+        <i v-else class="user-icon icon-personal-user node-svg" />
         <!-- eslint-disable max-len -->
         <span
           :style="nameStyle(item)"
           :class="['node-title', { 'node-selected': item.selected }]"
           :title="item.type === 'user' ? item.name !== '' ? `${item.username}(${item.name})` : item.username : item.name">
           {{ item.type === 'user' ? item.username : item.name }}<template v-if="item.type === 'user' && item.display_name !== ''">({{ item.display_name }})</template>
-        </span><span class="red-dot" v-if="item.isNewMember"></span><span class="node-user-count" v-if="item.showCount">{{ '(' + item.count + `)` }}</span>
+        </span><span class="red-dot" v-if="item.isNewMember"></span><span class="node-user-count" v-if="item.showCount && item.count">{{ '(' + item.count + `)` }}</span>
         <spin-loading ext-cls="loading" v-if="item.loading" />
         <div class="node-radio" v-if="item.showRadio">
           <span
@@ -49,11 +43,7 @@
 </template>
 <script>
 import _ from 'lodash';
-import Icon from './iconIndex';
 export default {
-  components: {
-    Icon,
-  },
   props: {
     // 所有数据
     allData: {

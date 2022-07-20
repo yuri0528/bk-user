@@ -1,7 +1,7 @@
 <template>
   <div class="iam-member-display-wrapper">
     <label class="label">
-      <Icon bk :type="icon" class="icon" />
+      <i :class="[userIcon, 'icon']" />
       <span class="name">{{ title }}</span>
     </label>
     <div class="content">
@@ -9,28 +9,27 @@
         v-for="(item, index) in data"
         :key="index"
         class="member-item"
-        :title="isDepartment ? (`${item.fullName}` ? `${item.fullName}` : ` ${item.name}`) :
-          item.name !== '' ? `${item.username}(${item.name})` : item.username">
-        <span class="member-name">
-          {{ isDepartment ? item.name : item.username }}
+        :title="isDepartment ? (`${item.full_name}` ? `${item.full_name}` : ` ${item.name}`) :
+          item.name !== '' ? `${item.username}(${item.email})` : item.username">
+        <span v-if="isDepartment" class="member-name">
+          {{ item.name ? item.name : item.full_name }}
         </span>
-        <template v-if="isDepartment">
+        <span v-else class="member-name">
+          {{ item.username ? item.username : item.email }}
+        </span>
+        <template v-if="isDepartment && item.count">
           <span class="count">({{ item.count }})</span>
         </template>
-        <template v-if="!isDepartment && item.name !== ''">
-          <span class="display_name">({{ item.name }})</span>
+        <template v-if="!isDepartment && item.email !== ''">
+          <span class="display_name">({{ item.email }})</span>
         </template>
-        <Icon bk type="close-circle-shape" class="remove-icon" v-if="isEdit" @click="handleDelete(index)" />
+        <i class="user-icon icon-close-fill remove-icon" v-if="isEdit" @click="handleDelete(index)" />
       </div>
     </div>
   </div>
 </template>
 <script>
-import Icon from './iconIndex';
 export default {
-  components: {
-    Icon,
-  },
   props: {
     data: {
       type: Array,
@@ -47,8 +46,8 @@ export default {
     },
   },
   computed: {
-    icon() {
-      return this.type === 'user' ? 'user-shape' : 'sitemap-shape';
+    userIcon() {
+      return this.type === 'user' ? 'user-icon icon-personal-user' : 'user-icon icon-organization-fill';
     },
     title() {
       return this.type === 'user' ? this.$t('用户') : this.$t('组织');
